@@ -28,14 +28,18 @@ class HeroSection extends StatelessWidget {
       children: [
         Expanded(child: _buildContent()),
         const SizedBox(width: 60),
-        Expanded(child: _buildImage()),
+        Expanded(child: _buildImage(isDesktop: true)),
       ],
     );
   }
 
   Widget _buildMobileLayout() {
     return Column(
-      children: [_buildContent(), const SizedBox(height: 40), _buildImage()],
+      children: [
+        _buildContent(),
+        const SizedBox(height: 40),
+        _buildImage(isDesktop: false),
+      ],
     );
   }
 
@@ -128,48 +132,60 @@ class HeroSection extends StatelessWidget {
 
         const SizedBox(height: 32),
 
+        // FIX 3: gunakan Expanded agar tidak overflow di mobile
         Row(
           children: [
-            _buildStat('250K+', 'Harga Mulai'),
-            const SizedBox(width: 40),
-            _buildStat('3-7 Hari', 'Pengerjaan Cepat'),
-            const SizedBox(width: 40),
-            _buildStat('Unlimited', 'Revisi'),
+            Expanded(child: _buildStat('250K+', 'Harga Mulai')),
+            Expanded(child: _buildStat('3-7 Hari', 'Pengerjaan Cepat')),
+            Expanded(child: _buildStat('Unlimited', 'Revisi')),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildImage() {
+  // FIX 2: banner mobile pakai AspectRatio agar tidak terpotong
+  Widget _buildImage({required bool isDesktop}) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24),
-      child: Image.asset(
-        'assets/images/banner.png',
-        height: 400,
-        width: double.infinity,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            height: 600,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.grayDark, AppColors.gold.withOpacity(0.1)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppColors.gold.withOpacity(0.3)),
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.image_outlined,
-                color: AppColors.gold,
-                size: 64,
+      child: isDesktop
+          ? Image.asset(
+              'assets/images/banner.png',
+              height: 400,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: _errorBuilder,
+            )
+          : AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Image.asset(
+                'assets/images/banner.png',
+                width: double.infinity,
+                fit: BoxFit.cover,
+                errorBuilder: _errorBuilder,
               ),
             ),
-          );
-        },
+    );
+  }
+
+  Widget _errorBuilder(
+    BuildContext context,
+    Object error,
+    StackTrace? stackTrace,
+  ) {
+    return Container(
+      height: 200,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.grayDark, AppColors.gold.withOpacity(0.1)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.gold.withOpacity(0.3)),
+      ),
+      child: const Center(
+        child: Icon(Icons.image_outlined, color: AppColors.gold, size: 64),
       ),
     );
   }
@@ -193,14 +209,14 @@ class HeroSection extends StatelessWidget {
         Text(
           value,
           style: const TextStyle(
-            fontSize: 32,
+            fontSize: 28,
             fontWeight: FontWeight.bold,
             color: AppColors.gold,
           ),
         ),
         Text(
           label,
-          style: const TextStyle(fontSize: 14, color: AppColors.grayLighter),
+          style: const TextStyle(fontSize: 13, color: AppColors.grayLighter),
         ),
       ],
     );
@@ -259,11 +275,11 @@ class _HoverButtonState extends State<_HoverButton> {
             onTap: widget.onPressed,
             borderRadius: BorderRadius.circular(24),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               child: Text(
                 widget.label,
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: widget.filled ? AppColors.black : AppColors.gold,
                 ),

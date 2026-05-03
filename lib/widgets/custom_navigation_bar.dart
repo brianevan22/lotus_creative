@@ -17,8 +17,94 @@ class CustomNavigationBar extends StatelessWidget {
     required this.onContactPressed,
   });
 
+  void _openMobileMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A1A),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          border: Border.all(color: AppColors.gold.withOpacity(0.2)),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.only(bottom: 24),
+              decoration: BoxDecoration(
+                color: AppColors.gold.withOpacity(0.4),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            _MobileMenuItem(
+              icon: Icons.home_outlined,
+              label: 'Beranda',
+              onPressed: () {
+                Navigator.pop(context);
+                onHomePressed();
+              },
+            ),
+            _MobileMenuItem(
+              icon: Icons.info_outline,
+              label: 'Tentang',
+              onPressed: () {
+                Navigator.pop(context);
+                onAboutPressed();
+              },
+            ),
+            _MobileMenuItem(
+              icon: Icons.design_services_outlined,
+              label: 'Layanan',
+              onPressed: () {
+                Navigator.pop(context);
+                onServicesPressed();
+              },
+            ),
+            _MobileMenuItem(
+              icon: Icons.photo_library_outlined,
+              label: 'Portfolio',
+              onPressed: () {
+                Navigator.pop(context);
+                onPortfolioPressed();
+              },
+            ),
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  onContactPressed();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.gold,
+                  foregroundColor: AppColors.black,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ),
+                child: const Text(
+                  'Hubungi Kami',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isDesktop = MediaQuery.of(context).size.width > 768;
+
     return Container(
       height: 80,
       decoration: BoxDecoration(
@@ -73,8 +159,7 @@ class CustomNavigationBar extends StatelessWidget {
 
             const Spacer(),
 
-            // Desktop Menu
-            if (MediaQuery.of(context).size.width > 768) ...[
+            if (isDesktop) ...[
               _NavButton(label: 'Beranda', onPressed: onHomePressed),
               const SizedBox(width: 32),
               _NavButton(label: 'Tentang', onPressed: onAboutPressed),
@@ -103,9 +188,54 @@ class CustomNavigationBar extends StatelessWidget {
               ),
             ] else
               IconButton(
-                icon: const Icon(Icons.menu, color: AppColors.gold),
-                onPressed: () {},
+                icon: const Icon(Icons.menu, color: AppColors.gold, size: 28),
+                onPressed: () => _openMobileMenu(context),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MobileMenuItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+
+  const _MobileMenuItem({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onPressed,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.gold.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: AppColors.gold, size: 20),
+            const SizedBox(width: 16),
+            Text(
+              label,
+              style: const TextStyle(color: AppColors.white, fontSize: 16),
+            ),
+            const Spacer(),
+            Icon(
+              Icons.chevron_right,
+              color: AppColors.gold.withOpacity(0.5),
+              size: 20,
+            ),
           ],
         ),
       ),
